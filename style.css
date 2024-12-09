@@ -1,0 +1,77 @@
+body {
+  margin-top: 100px;
+}
+
+.box {
+  margin: auto;
+  max-width: 448px;
+  border: 8px solid black;
+  border-radius: 10px;
+}
+
+.header {
+  background: #fff5f5;
+  min-height: 83px;
+  border-bottom: 7px solid black;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.reset:hover{
+cursor: pointer;
+background: rgb(228, 226, 226);
+}
+
+#rangeInput{
+    cursor: pointer;
+}
+
+.field {
+  background: black;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.string-of-num {
+  display: inline-flex;
+}
+
+.number{
+  transition: transform ease-out 0.25s;
+  font-size: xxx-large;
+  block-size: 100px;
+  text-align: center;
+  align-content: center;
+  border: 2px solid #704c4c;
+  border-radius: 25px;
+  background: beige;
+  cursor: pointer;
+}
+
+.number:hover{
+    background: rgb(234, 229, 229);
+}
+
+.number--empty {
+  opacity: 0;
+}
+
+.number--up {
+  transform: translateY(-100%);
+}
+
+.number--down {
+  transform: translateY(100%);
+}
+
+.number--left {
+  transform: translateX(-100%);
+}
+
+.number--right {
+  transform: translateX(100%);
+}
