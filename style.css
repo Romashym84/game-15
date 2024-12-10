@@ -20,13 +20,68 @@ body {
   align-items: center;
 }
 
-.reset:hover{
-cursor: pointer;
-background: rgb(228, 226, 226);
+.menu {
+  position: relative;
+  display: inline-block;
 }
 
-#rangeInput{
-    cursor: pointer;
+.menu-content {
+  display: none;
+  position: absolute;
+  border-radius: 7px;
+  background-color: #c7f298;
+  min-width: 260px;
+  min-height: 120px;
+  box-shadow: -20px -20px 11px 1px rgb(100 97 97);
+  z-index: 1;
+}
+
+.menu-content-show {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-end;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.start {
+  border: solid 2px;
+  border-radius: 6px;
+  max-width: 44px;
+  text-align: center;
+  margin: 10px 95px;
+}
+
+.start:hover {
+  cursor: pointer;
+  background: aquamarine;
+}
+
+.resize {
+  display: flex;
+}
+
+.classic:hover {
+  cursor: pointer;
+  background: aquamarine;
+}
+
+.intelectual {
+  display: flex;
+}
+
+.intelectual:hover {
+  cursor: pointer;
+  background: aquamarine;
+}
+
+.reset:hover {
+  cursor: pointer;
+  background: rgb(228, 226, 226);
+}
+
+#rangeInput {
+  cursor: pointer;
 }
 
 .field {
@@ -40,7 +95,7 @@ background: rgb(228, 226, 226);
   display: inline-flex;
 }
 
-.number{
+.number {
   transition: transform ease-out 0.25s;
   font-size: xxx-large;
   block-size: 100px;
@@ -52,8 +107,8 @@ background: rgb(228, 226, 226);
   cursor: pointer;
 }
 
-.number:hover{
-    background: rgb(234, 229, 229);
+.number:hover {
+  background: rgb(234, 229, 229);
 }
 
 .number--empty {

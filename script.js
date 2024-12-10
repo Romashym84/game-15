@@ -6,12 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetButton = document.querySelector(".reset");
   const countDisplay = document.getElementById("count_num");
   const timerDisplay = document.getElementById("timer_num");
+  const menu = document.querySelector(".menu");
+  const menuContent = document.querySelector(".menu-content");
+  const typGameClassic = document.querySelector(".classic");
+  const typGameIntelectual = document.querySelector(".intelectual");
+  const numberOfShift = document.getElementById("number-of-shifts");
 
+  let runCount = 0;
   let showCount = 0;
   let timer = null;
   let startTime = null;
   let isActiveAnimation = false;
   let isActiveGame = false;
+  let gameClassicActive = true;
+  let gameIntelectualActive = false;
   //   let sizeField;
 
   function startTimer() {
@@ -74,8 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   field.addEventListener("click", (event) => {
     if (isActiveAnimation) return;
-    event.preventDefault();
-    console.log(event.defaultPrevented);
 
     // if (checkState(state)) return;
 
@@ -99,10 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
         updateRender();
         countDisplay.textContent = ++showCount;
         console.log(showCount);
-        if (checkState(state)) {
-          alert("ОТ МОЛОДЕЦЬ!!!");
-          stopTimer();
-        }
+        // if (checkState(state)) {
+        //   alert("ОТ МОЛОДЕЦЬ!!!");
+        //   stopTimer();
+        // }
 
         isActiveAnimation = false;
       }, 250);
@@ -130,6 +136,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return (box.style.maxWidth = "645px");
     }
   }
+
+  menu.addEventListener("click", (event) => {
+    const target = event.target;
+    menuContent.classList.add("menu-content-show");
+    console.log(target.textContent);
+    if (target.classList.contains("start")) {
+      menuContent.classList.remove("menu-content-show");
+    }
+    if (target.classList.contains("classic")) {
+      target.style.background = "red";
+      typGameIntelectual.style.background = "";
+      gameIntelectualActive = false;
+      gameClassicActive = true;
+    }
+    if (target.classList.contains("intelectual")) {
+      target.style.background = "red";
+      typGameClassic.style.background = "";
+      gameIntelectualActive = true;
+      gameClassicActive = false;
+    }
+  });
 });
 
 function render(list, container) {

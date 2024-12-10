@@ -80,7 +80,6 @@ function checkMoove(state, value) {
 }
 
 function move(state, value) {
-  //   debugger;
   const coord = checkMoove(state, value);
   if (!coord) return;
   const index = state.indexOf(value);
@@ -155,7 +154,6 @@ function initGame() {
 function checkInversion(state) {
   const stateNoEmpty = state.filter((state) => state !== EMPTY_VALUE);
   const emptyY = getCoordByEmpty(state).y + 1;
-  console.log(emptyY);
   let inversion = 0;
   for (let i = 0; i < stateNoEmpty.length; i++) {
     for (let j = i + 1; j < stateNoEmpty.length; j++) {

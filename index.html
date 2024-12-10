@@ -16,8 +16,41 @@
   <body>
     <div class="box">
       <div class="header">
-        <input type="RANGE" min="3" max="6" step="1" value="4" id="rangeInput"/>
-        <div id="rangeValue">4</div>
+        <div class="menu">
+          <img src="assets\Menu_icon_2_icon-icons.com_71856.png" />
+          <div class="menu-content">
+            <div class="config">
+              <div class="resize">
+                Resize
+                <input
+                  type="RANGE"
+                  min="3"
+                  max="6"
+                  step="1"
+                  value="4"
+                  id="rangeInput"
+                />
+                <div id="rangeValue">4</div>
+              </div>
+              <div class="type-of-game">
+                <div class="classic">Classic</div>
+                <div class="intelectual">
+                  Intelectual
+                  <form>
+                    <input
+                      type="text"
+                      id="number-of-shifts"
+                      value=""
+                      placeholder="Введіть кількість кроків"
+                    />
+                  </form>
+                </div>
+                <div class="start">Start</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="count">
           <div id="count_inf">Count</div>
           <div id="count_num">0</div>
