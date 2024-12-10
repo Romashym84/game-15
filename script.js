@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuContent = document.querySelector(".menu-content");
   const typGameClassic = document.querySelector(".classic");
   const typGameIntelectual = document.querySelector(".intelectual");
-  const numberOfShift = document.getElementById("number-of-shifts");
+  const numberRefreshValue = document.getElementById("number-of-shifts");
 
   let runCount = 0;
   let showCount = 0;
@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let isActiveAnimation = false;
   let isActiveGame = false;
   let gameClassicActive = true;
-  let gameIntelectualActive = false;
   //   let sizeField;
 
   function startTimer() {
@@ -83,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   field.addEventListener("click", (event) => {
     if (isActiveAnimation) return;
 
-    // if (checkState(state)) return;
+    //if (checkState(state)) return;
 
     const target = event.target;
 
@@ -103,13 +102,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         updateRender();
-        countDisplay.textContent = ++showCount;
-        console.log(showCount);
-        // if (checkState(state)) {
-        //   alert("ОТ МОЛОДЕЦЬ!!!");
-        //   stopTimer();
-        // }
-
+        if (gameClassicActive) {
+          countDisplay.textContent = ++showCount;
+          console.log(showCount);
+          startTimer();
+          if (checkState(state)) {
+            alert("ОТ МОЛОДЕЦЬ!!!");
+            stopTimer();
+          }
+        } else {
+          countDisplay.textContent = ++showCount;
+          console.log(isActiveGame);
+          if (checkState(state)) {
+            alert("ОТ МОЛОДЕЦЬ!!!");
+            stopTimer();
+          }
+        }
         isActiveAnimation = false;
       }, 250);
     }
@@ -139,22 +147,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   menu.addEventListener("click", (event) => {
     const target = event.target;
+    const refreshNumber = numberRefreshValue.textContent;
+    console.log(refreshNumber);
     menuContent.classList.add("menu-content-show");
     console.log(target.textContent);
-    if (target.classList.contains("start")) {
-      menuContent.classList.remove("menu-content-show");
-    }
+
     if (target.classList.contains("classic")) {
       target.style.background = "red";
       typGameIntelectual.style.background = "";
-      gameIntelectualActive = false;
       gameClassicActive = true;
     }
+
     if (target.classList.contains("intelectual")) {
       target.style.background = "red";
       typGameClassic.style.background = "";
-      gameIntelectualActive = true;
       gameClassicActive = false;
+    }
+
+    if (target.classList.contains("start")) {
+      if (!gameClassicActive) {
+        let value = +numberRefreshValue.value;
+
+        if (!value) {
+          alert("Введіть кількість кроків");
+          return;
+        } else {
+          state = setInitialState(gameConfig.size);
+          autoRun(value);
+        }
+      } else {
+        refresh();
+        init();
+      }
+      menuContent.classList.remove("menu-content-show");
     }
   });
 });

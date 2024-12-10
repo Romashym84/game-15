@@ -148,7 +148,7 @@ function refresh() {
 
 function initGame() {
     state = setInitialState(gameConfig.size);
-//   refresh();
+   refresh();
 }
 
 function checkInversion(state) {
