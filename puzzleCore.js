@@ -142,10 +142,6 @@ function refresh() {
   }
 }
 
-// function refresh() {
-//   state = setInitialState(gameConfig.size);
-// }
-
 function initGame() {
     state = setInitialState(gameConfig.size);
    refresh();

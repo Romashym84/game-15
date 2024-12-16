@@ -1,7 +1,22 @@
+const gameStatus = {
+  isActiveAnimation: false,
+  isActiveGame: false,
+  isAutoRuning: false,
+  gameClassicActive: true,
+};
+
+let showCount = 0;
+let countRefresh = 0;
+let timer = null;
+let startTime = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   const box = document.querySelector(".box");
   const field = document.querySelector(".field");
   const range = document.getElementById("rangeInput");
+  const classic = document.querySelector(".classic");
+  const intelectual = document.querySelector(".intelectual");
+  const start = document.querySelector(".start");
   const rangeValue = document.getElementById("rangeValue");
   const resetButton = document.querySelector(".reset");
   const countDisplay = document.getElementById("count_num");
@@ -12,14 +27,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const typGameIntelectual = document.querySelector(".intelectual");
   const numberRefreshValue = document.getElementById("number-of-shifts");
 
-  let runCount = 0;
-  let showCount = 0;
-  let timer = null;
-  let startTime = null;
-  let isActiveAnimation = false;
-  let isActiveGame = false;
-  let gameClassicActive = true;
-  //   let sizeField;
+  loadLocalStorage();
+  init();
+
+  function saveLocalStorage() {
+    const { gameClassicActive } = gameStatus;
+    localStorage.setItem("gameStatus", JSON.stringify({ gameClassicActive }));
+    localStorage.setItem("gameConfig", JSON.stringify(gameConfig.size));
+    localStorage.setItem(
+      "numberRefreshValue",
+      JSON.stringify(numberRefreshValue.value)
+    );
+  }
+
+  function loadLocalStorage() {
+    const localTypGame = localStorage.getItem("gameStatus");
+    const localRangeValue = localStorage.getItem("gameConfig");
+    const refreshValue = localStorage.getItem("numberRefreshValue");
+
+    if (localTypGame) {
+      try {
+        numberRefreshValue.value = JSON.parse(refreshValue);
+        const savedStatus = JSON.parse(localTypGame);
+        gameStatus.gameClassicActive = savedStatus.gameClassicActive;
+        console.log(gameStatus.gameClassicActive);
+        gameStatus.gameClassicActive
+          ? (typGameClassic.style.background = "red")
+          : (typGameIntelectual.style.background = "red");
+      } catch (e) {
+        console.error("Помилка під час завантаження статусу гри", e);
+      }
+    }
+
+    if (localRangeValue) {
+      try {
+        gameConfig.size = JSON.parse(localRangeValue);
+        rangeValue.textContent = JSON.parse(localRangeValue);
+        range.value = JSON.parse(localRangeValue);
+      } catch (e) {
+        console.error("Помилка під час завантаження розміру гри", e);
+      }
+    }
+  }
 
   function startTimer() {
     if (!startTime) {
@@ -44,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function stopTimer() {
     if (timer !== null) {
       clearInterval(timer);
+      startTime = null;
       timer = null;
     }
   }
@@ -57,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function initStyle(size) {
+    box.style.maxWidth = resizeField(gameConfig.size);
     const value = `repeat(${size}, 1fr)`;
     field.style = `grid-template-columns:${value};grid-template-rows: ${value};`;
   }
@@ -72,65 +123,78 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   resetButton.addEventListener("click", () => {
-    isActiveGame = false;
+    gameStatus.isActiveGame = false;
     resetAll();
     init();
   });
 
   init();
 
-  field.addEventListener("click", (event) => {
-    if (isActiveAnimation) return;
+  function stopCount() {
+    showCount = showCount;
+  }
 
-    //if (checkState(state)) return;
+  function isControleVictory() {
+    countRefresh++;
+
+    if (!gameStatus.isAutoRuning && checkState(state)) {
+      alert("ОТ МОЛОДЕЦЬ!!!");
+      stopTimer();
+      stopCount();
+    }
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  field.addEventListener("click", async (event) => {
+    if (gameStatus.isActiveAnimation) return;
+
+    if (gameStatus.gameClassicActive) {
+      if (checkState(state)) return;
+    }
 
     const target = event.target;
 
-    if (target.classList.contains("number")) {
-      console.log(target.textContent);
-      const direction = move(state, Number.parseInt(target.textContent));
+    if (!target.classList.contains("number")) return;
 
-      if (!direction) return;
+    const direction = move(state, Number.parseInt(target.textContent));
 
-      target.classList.add(`number--${direction}`);
-      isActiveAnimation = true;
+    if (!direction) return;
 
-      if (!isActiveGame) {
-        startTimer();
-        isActiveGame = true;
-      }
+    target.classList.add(`number--${direction}`);
+    gameStatus.isActiveAnimation = true;
 
-      setTimeout(() => {
-        updateRender();
-        if (gameClassicActive) {
-          countDisplay.textContent = ++showCount;
-          console.log(showCount);
-          startTimer();
-          if (checkState(state)) {
-            alert("ОТ МОЛОДЕЦЬ!!!");
-            stopTimer();
-          }
-        } else {
-          countDisplay.textContent = ++showCount;
-          console.log(isActiveGame);
-          if (checkState(state)) {
-            alert("ОТ МОЛОДЕЦЬ!!!");
-            stopTimer();
-          }
-        }
-        isActiveAnimation = false;
-      }, 250);
+    if (!gameStatus.isActiveGame) {
+      startTimer();
     }
-  });
 
-  range.addEventListener("input", (event) => {
-    const size = event.target.value;
-    console.log(size);
-    rangeValue.textContent = size;
-    setSize(size);
-    init();
-    console.log(gameConfig.size);
-    box.style.maxWidth = resizeField(gameConfig.size);
+    await delay(250);
+
+    updateRender();
+
+    if (gameStatus.gameClassicActive) {
+      countDisplay.textContent = ++showCount;
+      console.log(showCount);
+      if (checkState(state)) {
+        alert("ОТ МОЛОДЕЦЬ!!!");
+        stopTimer();
+      }
+    } else {
+      console.log("auto", gameStatus.isAutoRuning);
+      if (gameStatus.isAutoRuning) {
+        countDisplay.textContent = ++showCount;
+      } else {
+        countDisplay.textContent = --showCount + 2;
+        console.log(numberRefreshValue.value);
+        isControleVictory(+numberRefreshValue.value);
+        if (checkState(state)) return;
+      }
+    }
+
+    gameStatus.isActiveAnimation = false;
+    console.log(gameStatus.isAutoRuning);
   });
 
   function resizeField(size) {
@@ -146,41 +210,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   menu.addEventListener("click", (event) => {
-    const target = event.target;
-    const refreshNumber = numberRefreshValue.textContent;
-    console.log(refreshNumber);
+    if (event.target === menuContent || menuContent.contains(event.target))
+      return;
+    console.log("Menu");
     menuContent.classList.add("menu-content-show");
-    console.log(target.textContent);
+  });
 
-    if (target.classList.contains("classic")) {
-      target.style.background = "red";
-      typGameIntelectual.style.background = "";
-      gameClassicActive = true;
-    }
+  range.addEventListener("input", (event) => {
+    console.log("Range");
+    const size = event.target.value;
+    console.log(size);
+    rangeValue.textContent = size;
+    setSize(size);
+    init();
+    box.style.maxWidth = resizeField(gameConfig.size);
+  });
 
-    if (target.classList.contains("intelectual")) {
-      target.style.background = "red";
-      typGameClassic.style.background = "";
-      gameClassicActive = false;
-    }
+  classic.addEventListener("click", (event) => {
+    console.log("Classic");
+    typGameClassic.style.background = "red";
+    typGameIntelectual.style.background = "";
+    gameStatus.gameClassicActive = true;
+  });
 
-    if (target.classList.contains("start")) {
-      if (!gameClassicActive) {
-        let value = +numberRefreshValue.value;
+  intelectual.addEventListener("click", (event) => {
+    console.log("Intelectual");
+    typGameIntelectual.style.background = "red";
+    typGameClassic.style.background = "";
+    gameStatus.gameClassicActive = false;
+  });
 
-        if (!value) {
-          alert("Введіть кількість кроків");
-          return;
-        } else {
-          state = setInitialState(gameConfig.size);
-          autoRun(value);
-        }
+  start.addEventListener("click", () => {
+    console.log("Start");
+    if (!gameStatus.gameClassicActive) {
+      init();
+      let value = +numberRefreshValue.value;
+
+      if (!value) {
+        alert("Введіть кількість кроків");
+        return;
       } else {
-        refresh();
-        init();
+        state = setInitialState(gameConfig.size);
+        autoRun(value);
+        stopTimer();
       }
-      menuContent.classList.remove("menu-content-show");
+    } else {
+      refresh();
+      init();
     }
+
+    menuContent.classList.remove("menu-content-show");
+    console.log("saveLocal");
+    saveLocalStorage();
   });
 });
 
@@ -204,15 +285,23 @@ function render(list, container) {
 
 function autoRun(count) {
   let curentCount = 0;
+  gameStatus.isAutoRuning = true;
   const id = setInterval(() => {
     const value = getRandomActiveValue(state);
     const elem = document.getElementById(`num_${value}`);
+    gameStatus.isActiveGame = false;
 
     if (elem) {
       elem.click();
+      console.log(gameStatus.isActiveGame);
     }
-    console.log(curentCount, value, elem);
-    curentCount++;
-    if (curentCount === count) clearInterval(id);
+
+    console.log("AUTORUN", curentCount, count, gameStatus.isAutoRuning);
+    ++curentCount;
+    if (curentCount === count) {
+      clearInterval(id);
+      gameStatus.isAutoRuning = false;
+      gameStatus.isActiveGame = true;
+    }
   }, 300);
 }
