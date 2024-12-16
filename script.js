@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         numberRefreshValue.value = JSON.parse(refreshValue);
         const savedStatus = JSON.parse(localTypGame);
         gameStatus.gameClassicActive = savedStatus.gameClassicActive;
-        console.log(gameStatus.gameClassicActive);
         gameStatus.gameClassicActive
           ? (typGameClassic.style.background = "red")
           : (typGameIntelectual.style.background = "red");
@@ -116,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initStyle(gameConfig.size);
     initGame();
     updateRender();
+    gameStatus.isActiveAnimation = false;
   }
 
   function updateRender() {
@@ -166,35 +166,33 @@ document.addEventListener("DOMContentLoaded", () => {
     target.classList.add(`number--${direction}`);
     gameStatus.isActiveAnimation = true;
 
-    if (!gameStatus.isActiveGame) {
+    if (gameStatus.isActiveGame) {
       startTimer();
     }
 
+    const isAutoRuning = gameStatus.isAutoRuning;
     await delay(250);
 
     updateRender();
 
     if (gameStatus.gameClassicActive) {
       countDisplay.textContent = ++showCount;
-      console.log(showCount);
+
       if (checkState(state)) {
         alert("ОТ МОЛОДЕЦЬ!!!");
         stopTimer();
       }
     } else {
-      console.log("auto", gameStatus.isAutoRuning);
-      if (gameStatus.isAutoRuning) {
+      if (isAutoRuning) {
         countDisplay.textContent = ++showCount;
       } else {
-        countDisplay.textContent = --showCount + 2;
-        console.log(numberRefreshValue.value);
+        countDisplay.textContent = --showCount;
         isControleVictory(+numberRefreshValue.value);
         if (checkState(state)) return;
       }
     }
 
     gameStatus.isActiveAnimation = false;
-    console.log(gameStatus.isAutoRuning);
   });
 
   function resizeField(size) {
@@ -212,14 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
   menu.addEventListener("click", (event) => {
     if (event.target === menuContent || menuContent.contains(event.target))
       return;
-    console.log("Menu");
     menuContent.classList.add("menu-content-show");
   });
 
   range.addEventListener("input", (event) => {
-    console.log("Range");
     const size = event.target.value;
-    console.log(size);
     rangeValue.textContent = size;
     setSize(size);
     init();
@@ -227,21 +222,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   classic.addEventListener("click", (event) => {
-    console.log("Classic");
     typGameClassic.style.background = "red";
     typGameIntelectual.style.background = "";
     gameStatus.gameClassicActive = true;
   });
 
   intelectual.addEventListener("click", (event) => {
-    console.log("Intelectual");
     typGameIntelectual.style.background = "red";
     typGameClassic.style.background = "";
     gameStatus.gameClassicActive = false;
   });
 
   start.addEventListener("click", () => {
-    console.log("Start");
     if (!gameStatus.gameClassicActive) {
       init();
       let value = +numberRefreshValue.value;
@@ -252,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         state = setInitialState(gameConfig.size);
         autoRun(value);
-        stopTimer();
+        resetAll();
       }
     } else {
       refresh();
@@ -260,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     menuContent.classList.remove("menu-content-show");
-    console.log("saveLocal");
     saveLocalStorage();
   });
 });
@@ -289,11 +280,11 @@ function autoRun(count) {
   const id = setInterval(() => {
     const value = getRandomActiveValue(state);
     const elem = document.getElementById(`num_${value}`);
-    gameStatus.isActiveGame = false;
 
     if (elem) {
+      console.log("##", "beforeRunClick");
       elem.click();
-      console.log(gameStatus.isActiveGame);
+      console.log("##", "afterRunClick");
     }
 
     console.log("AUTORUN", curentCount, count, gameStatus.isAutoRuning);
